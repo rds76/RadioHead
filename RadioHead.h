@@ -1733,9 +1733,15 @@ these examples and explanations and extend them to suit your needs.
  #define ATOMIC_BLOCK_START { uint32_t __savedPS = xt_rsil(15);
  #define ATOMIC_BLOCK_END xt_wsr_ps(__savedPS);}
 #elif (RH_PLATFORM == RH_PLATFORM_ESP32)
-// jPerotto see hardware/esp32/1.0.4/tools/sdk/include/esp32/xtensa/xruntime.h
- #define ATOMIC_BLOCK_START uint32_t volatile register ilevel = XTOS_DISABLE_ALL_INTERRUPTS;
- #define ATOMIC_BLOCK_END XTOS_RESTORE_INTLEVEL(ilevel);
+ #ifdef __XTENSA__
+  // jPerotto see hardware/esp32/1.0.4/tools/sdk/include/esp32/xtensa/xruntime.h
+  #define ATOMIC_BLOCK_START uint32_t volatile register ilevel = XTOS_DISABLE_ALL_INTERRUPTS;
+  #define ATOMIC_BLOCK_END XTOS_RESTORE_INTLEVEL(ilevel);
+ #endif
+ #ifdef __riscv
+  #define ATOMIC_BLOCK_START int state = portSET_INTERRUPT_MASK_FROM_ISR();
+  #define ATOMIC_BLOCK_END portCLEAR_INTERRUPT_MASK_FROM_ISR(state);
+ #endif
 #else 
  // TO BE DONE:
  #define ATOMIC_BLOCK_START
