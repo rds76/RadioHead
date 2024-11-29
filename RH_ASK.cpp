@@ -525,10 +525,9 @@ void RH_ASK::timerSetup()
 //    timer0_write(ESP.getCycleCount() + 41660000);
 #elif (RH_PLATFORM == RH_PLATFORM_ESP32)
     void RH_INTERRUPT_ATTR esp32_timer_interrupt_handler(); // Forward declaration
-    timer = timerBegin(0, 80, true); // Alarm value will be in in us
-    timerAttachInterrupt(timer, &esp32_timer_interrupt_handler, true);
-    timerAlarmWrite(timer, 1000000 / _speed / 8, true);
-    timerAlarmEnable(timer);
+    timer = timerBegin(1000000);
+    timerAttachInterrupt(timer, &esp32_timer_interrupt_handler);
+    timerAlarm(timer, 1000000 / _speed / 8, true, 0);
 #endif
 
 }
